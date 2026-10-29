@@ -1,81 +1,50 @@
 let characters;
-let leftBubble;
-let rightBubble;
 
-let settings = {
-  figureOpacity: 158,
-  turns: 3.4,
-  rotationSpeed: 0.19,
-  noiseAmount: 0.075
-};
+function preload() {
+  characters = loadImage('person A-1.1.png');
+}
 
-async function setup() {
+// Size, opacity and motion settings.
+let bubbleSize = 0.35;
+let bubbleOpacity = 235;
+let breathingAmount = 0.012;
+let breathingSpeed = 0.65;
+let bubbleTime = 0;
+
+function setup() {
   createCanvas(windowWidth, windowHeight);
-  pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-
-  noLoop();
-
-  characters = await loadImage('characters-transparent.png');
-
-  setupWrap(41, settings.turns);
-  leftBubble = createBubble(97, true);
-  rightBubble = createBubble();
-
-  loop();
+  pixelDensity(1);
+  createBubbleTexture();
 }
 
 function draw() {
+  // Clear each frame without painting a background.
   clear();
 
-  if (!characters || !leftBubble || !rightBubble) {
-    return;
-  }
-
-  let scale = Math.min(
-    width / characters.width,
-    height / characters.height
+  let scale = min(
+    width * 0.4 / characters.width,
+    height * 0.9 / characters.height
   );
 
-  let w = characters.width * scale;
-  let h = characters.height * scale;
-  let x = (width - w) / 2;
-  let y = (height - h) / 2;
-  let dt = Math.min(deltaTime / 1000, 0.05);
-
-  updateWrap(
-    dt,
-    x + w * 0.363,
-    y + h * 0.35,
-    h * 0.49,
-    w * 0.092,
-    settings.rotationSpeed,
-    settings.noiseAmount
-  );
-
-  drawBubble(
-    leftBubble,
-    x + w * 0.363,
-    y + h * 0.35,
-    w * 0.114 * 1.06,
-    dt
-  );
-
-  drawWrapLayer('back');
-
+  // Draw the figures behind the bubble.
   push();
-  tint(255, settings.figureOpacity);
-  image(characters, x, y, w, h);
+  imageMode(CENTER);
+
+  image(
+  characters,
+  width / 2,
+  height / 2,
+  characters.width * scale,
+  characters.height * scale
+  );
+
   pop();
 
-  drawWrapLayer('front');
+  bubbleTime += min(deltaTime / 1000, 0.05);
 
-  drawBubble(
-    rightBubble,
-    x + w * 0.651,
-    y + h * 0.365,
-    w * 0.114 * 1.06,
-    dt
-  );
+  let size = min(width, height) * bubbleSize;
+  let bubbleY = height / 2 - characters.height * scale * 0.25;
+  drawBubble(width / 2, bubbleY, size);
 }
 
 function windowResized() {

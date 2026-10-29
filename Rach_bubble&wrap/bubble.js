@@ -1,62 +1,99 @@
-let bubbleTexture;
+function createBubble(seed, red, green, blue) {
+  randomSeed(seed);
 
-function createBubbleTexture() {
-  // Build the transparent texture once.
-  bubbleTexture = createGraphics(900, 900);
-  bubbleTexture.pixelDensity(1);
-  bubbleTexture.loadPixels();
+  let bubble = {
+    red: red,
+    green: green,
+    blue: blue,
+    offset: random(20, 800),
+    step: 0,
+    edge: [],
+    edgeX: [],
+    edgeY: [],
+    grains: []
+  };
 
-  randomSeed(41);
-  noiseSeed(41);
-
-  for (let y = 0; y < 900; y++) {
-    for (let x = 0; x < 900; x++) {
-      let dx = (x - 450) / 430;
-      let dy = (y - 450) / 430;
-      let distance = sqrt(dx * dx + dy * dy);
-
-      if (distance <= 1) {
-        // A soft light ring with Perlin noise for cloudy variation.
-        let ring = exp(-pow((distance - 0.87) / 0.12, 2));
-        let cloud = noise(x * 0.012, y * 0.012);
-        let light = 0.94 - dx * 0.12 - dy * 0.10;
-        let frost = constrain((distance - 0.92) / 0.08, 0, 1);
-        let grain = random(-1, 1);
-
-        let alpha = 116 + 112 * ring * light;
-        alpha += (cloud - 0.5) * 16;
-        alpha += grain * (2 + frost * 110);
-
-        // Fixed random grain gives the edge a frosted texture.
-        if (distance > 0.95 && random() < frost * 0.28) {
-          alpha *= 0.25;
-        }
-
-        alpha *= constrain((1 - distance) * 150, 0, 1);
-
-        // Each pixel stores red, green, blue and alpha.
-        let index = (x + y * 900) * 4;
-        bubbleTexture.pixels[index] = 212 + ring * 12;
-        bubbleTexture.pixels[index + 1] = 217 + ring * 16;
-        bubbleTexture.pixels[index + 2] = 225 + ring * 20;
-        bubbleTexture.pixels[index + 3] = constrain(alpha, 0, 245);
-      }
-    }
+  // Generate fixed random grains once, so they do not flicker.
+  for (let i = 0; i < 2200; i++) {
+    let grain = {
+      angle: random(TWO_PI),
+      distance: random(0.93, 1.015),
+      size: random(0.6, 1.8),
+      alpha: random(45, 180)
+    };
+    bubble.grains.push(grain);
   }
 
-  bubbleTexture.updatePixels();
+  return bubble;
 }
 
-function drawBubble(x, y, size) {
-  // Time-based Perlin noise creates smooth, irregular breathing.
-  let breath = 1 + (noise(10, bubbleTime * breathingSpeed) - 0.5) * 2 * breathingAmount;
-  let widthChange = 1 + (noise(30, bubbleTime * 0.37) - 0.5) * 0.016;
-  let heightChange = 1 + (noise(50, bubbleTime * 0.41) - 0.5) * 0.016;
+function updateBubble(bubble, speed, amount) {
+  // Advance through Perlin noise to move the outline smoothly.
+  bubble.step += min(deltaTime / 1000, 0.05) * speed;
+
+  for (let i = 0; i < 96; i++) {
+    let angle = i / 96 * TWO_PI;
+
+    // Sample a closed circle in the noise field to avoid a seam.
+    let value = noise(
+      bubble.offset + cos(angle) * 1.3,
+      bubble.offset + sin(angle) * 1.3,
+      bubble.step
+    );
+
+    bubble.edge[i] = 1 + (value - 0.5) * amount;
+    bubble.edgeX[i] = cos(angle) * bubble.edge[i];
+    bubble.edgeY[i] = sin(angle) * bubble.edge[i];
+  }
+}
+
+function drawOutline(bubble, radius, scale) {
+  beginShape();
+
+  // Reuse the same outline for every soft light layer.
+  for (let i = 0; i < 96; i++) {
+    vertex(bubble.edgeX[i] * radius * scale, bubble.edgeY[i] * radius * scale);
+  }
+
+  endShape(CLOSE);
+}
+
+function drawBubble(bubble, x, y, size) {
+  let radius = size / 2;
 
   push();
   translate(x, y);
-  imageMode(CENTER);
-  tint(255, bubbleOpacity);
-  image(bubbleTexture, 0, 0, size * breath * widthChange, size * breath * heightChange);
+
+  // A translucent white interior.
+  noStroke();
+  fill(235, 237, 242, 105);
+  drawOutline(bubble, radius, 1);
+
+  // Closely spaced outlines make a soft frosted rim.
+  noFill();
+  strokeWeight(radius * 0.048);
+
+  for (let layer = 0; layer < 64; layer++) {
+    let scale = 0.61 + layer * 0.006;
+    let glow = exp(-pow((scale - 0.87) / 0.105, 2));
+    stroke(bubble.red, bubble.green, bubble.blue, glow * 38);
+    drawOutline(bubble, radius, scale);
+  }
+
+  // Random grains follow the same moving outline.
+  noStroke();
+  for (let i = 0; i < bubble.grains.length; i++) {
+    let grain = bubble.grains[i];
+    let position = grain.angle / TWO_PI * 96;
+    let index = floor(position);
+    let next = (index + 1) % 96;
+    let edge = lerp(bubble.edge[index], bubble.edge[next], position - index);
+    let r = radius * edge * grain.distance;
+    let dotSize = grain.size * size / 430;
+
+    fill(bubble.red, bubble.green, bubble.blue, grain.alpha);
+    circle(cos(grain.angle) * r, sin(grain.angle) * r, dotSize);
+  }
+
   pop();
 }

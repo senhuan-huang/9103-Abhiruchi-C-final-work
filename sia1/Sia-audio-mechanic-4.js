@@ -7,7 +7,7 @@ let particles = [];
 function preload() {
   // Load the audio file
   song = loadSound("assets/music1.wav");
-  img = loadImage("assets/BG1.png")
+  img = loadImage("assets/BGfinal.png")
 }
 
 function setup() {
@@ -39,7 +39,7 @@ function draw() {
   translate(width / 2, height / 2 - 20);
 
   fft.analyze()
-  amplitude = fft.getEnergy(20, 200);
+  let amplitude = fft.getEnergy(20, 200);
 
   push()
   if (amplitude > 200){
@@ -48,7 +48,27 @@ function draw() {
   
   image(img,0,0,width + 100,height + 100)
   pop()
+
+  let alpha = map(amplitude, 0, 255, 150, 120)
+  fill(0,0,0,alpha)
+  rect(0,0,width + 100,height + 100)
+
+
+  // Soft vignette
+  push()
+  noFill()
+
+  for(let i = 0; i < 140; i += 10){
+    let vignetteAlpha = map(i,0,140,18,0)
+    stroke(125,100,145,vignetteAlpha)
+    strokeWeight(12)
+    rect(0,20,width - i,height - i)
+  }
+
+  pop()
+
   
+  // Map audio energy to the hue spectrum
   let colorAmount = map(amplitude,60,180,0,1)
   colorAmount = constrain(colorAmount,0,1)
 
@@ -60,17 +80,16 @@ function draw() {
   let lineColor
 
   if(colorAmount < 0.33){
-  lineColor = lerpColor(cyan,bluePurple,colorAmount / 0.33)
+    lineColor = lerpColor(cyan,bluePurple,colorAmount / 0.33)
   }else if(colorAmount < 0.66){
-  lineColor = lerpColor(bluePurple,purple,(colorAmount - 0.33) / 0.33)
+    lineColor = lerpColor(bluePurple,purple,(colorAmount - 0.33) / 0.33)
   }else{
-  lineColor = lerpColor(purple,pink,(colorAmount - 0.66) / 0.34)
+    lineColor = lerpColor(purple,pink,(colorAmount - 0.66) / 0.34)
   }
 
   stroke(lineColor)
   strokeWeight(2)
   noFill()
-
 
   // Get waveform data
   let wave = fft.waveform();
@@ -93,46 +112,18 @@ function draw() {
     endShape();
   }
 
-
-// Inner circle colour changes from yellow to red
-let innerColorAmount = map(amplitude,60,180,0,1)
-innerColorAmount = constrain(innerColorAmount,0,1)
-
-let yellow = color(255,220,100)
-let red = color(235,90,90)
-
-let innerColor = lerpColor(yellow,red,innerColorAmount)
-
-stroke(innerColor)
-strokeWeight(2)
-noFill()
-
-// Draw the inner waveform circle
-for(let t = -1; t <= 1; t += 2){
-  beginShape()
-
-  for(let i = 0; i <= 180; i++){
-    let index = floor(map(i,0,180,0,wave.length - 1))
-    let r = map(wave[index],-1,1,85,125)
-
-    let x = r * sin(i) * t
-    let y = r * cos(i)
-
-    vertex(x,y)
-  }
-
-  endShape()
- }
- 
- 
-  //Add particles
+  // Add particles
   let p = new Particle()
   particles.push(p)
   
-  for(let i = particles.length -1; i >= 0; i--){
+  for(let i = particles.length - 1; i >= 0; i--){
     if(!particles[i].edges()){
       particles[i].show()
-      particles[i].update(amplitude > 130)
+
+      // Particles always move,
+      // but only speed up when the music is playing
+      particles[i].update(song.isPlaying() && amplitude > 130)
+
     }else{
       particles.splice(i, 1);
     }
@@ -142,17 +133,16 @@ for(let t = -1; t <= 1; t += 2){
 
 function playPause() {
   if (song.isPlaying()) {
-    song.pause();
-    noLoop();
+    song.stop();
   } else {
-    song.play();
-    loop();
+    song.loop();
   }
 }
 
+
 class Particle {
   constructor(){
-    this.pos =p5.Vector.random2D().mult(250)
+    this.pos = p5.Vector.random2D().mult(250)
     this.vel = createVector(0,0)
     this.acc = this.pos.copy().mult(random(0.0001,0.00001))
     
@@ -160,9 +150,11 @@ class Particle {
     
     this.color = [random(80,255),random(50,140),random(190,255)];
   }
+
   update(condition){
     this.vel.add(this.acc)
     this.pos.add(this.vel)
+
     if (condition){
       this.pos.add(this.vel)
       this.pos.add(this.vel)
@@ -170,19 +162,31 @@ class Particle {
     }
   }
   
-  //check if the particle is out of the canvas
+  // Check if the particle is out of the canvas
   edges(){
-    if(this.pos.x < -width/2 || this.pos.x > width/2 || this.pos.y < -height/2 || this.pos.y > height/2){
+    if(
+      this.pos.x < -width/2 || 
+      this.pos.x > width/2 || 
+      this.pos.y < -height/2 || 
+      this.pos.y > height/2
+    ){
       return true
     }else{
       return false
     }
   }
 
-
+  // Draw the particle
   show(){
     noStroke();
-    fill(this.color);
+
+    fill(this.color[0],this.color[1],this.color[2],15);
+    ellipse(this.pos.x,this.pos.y,this.w * 3.5);
+
+    fill(this.color[0],this.color[1],this.color[2],45);
+    ellipse(this.pos.x,this.pos.y,this.w * 2);
+
+    fill(this.color[0],this.color[1],this.color[2],220);
     ellipse(this.pos.x,this.pos.y,this.w);
   }
 }

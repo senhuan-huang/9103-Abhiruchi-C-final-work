@@ -48,15 +48,29 @@ function draw() {
   
   image(img,0,0,width + 100,height + 100)
   pop()
-
-  let alpha = map(amplitude, 0, 255, 180, 150)
-  fill(70, 60, 95, alpha)
-  noStroke()
-  rect(0,0,width + 100,height + 100)
-  stroke(235, 225, 250);
-  strokeWeight(2);
-  noFill();
   
+  let colorAmount = map(amplitude,60,180,0,1)
+  colorAmount = constrain(colorAmount,0,1)
+
+  let cyan = color(53,179,199)
+  let bluePurple = color(90,130,220)
+  let purple = color(146,120,232)
+  let pink = color(231,149,197)
+
+  let lineColor
+
+  if(colorAmount < 0.33){
+  lineColor = lerpColor(cyan,bluePurple,colorAmount / 0.33)
+  }else if(colorAmount < 0.66){
+  lineColor = lerpColor(bluePurple,purple,(colorAmount - 0.33) / 0.33)
+  }else{
+  lineColor = lerpColor(purple,pink,(colorAmount - 0.66) / 0.34)
+  }
+
+  stroke(lineColor)
+  strokeWeight(2)
+  noFill()
+
 
   // Get waveform data
   let wave = fft.waveform();
@@ -78,6 +92,38 @@ function draw() {
 
     endShape();
   }
+
+
+// Inner circle colour changes from yellow to red
+let innerColorAmount = map(amplitude,60,180,0,1)
+innerColorAmount = constrain(innerColorAmount,0,1)
+
+let yellow = color(255,220,100)
+let red = color(235,90,90)
+
+let innerColor = lerpColor(yellow,red,innerColorAmount)
+
+stroke(innerColor)
+strokeWeight(2)
+noFill()
+
+// Draw the inner waveform circle
+for(let t = -1; t <= 1; t += 2){
+  beginShape()
+
+  for(let i = 0; i <= 180; i++){
+    let index = floor(map(i,0,180,0,wave.length - 1))
+    let r = map(wave[index],-1,1,85,125)
+
+    let x = r * sin(i) * t
+    let y = r * cos(i)
+
+    vertex(x,y)
+  }
+
+  endShape()
+ }
+ 
  
   //Add particles
   let p = new Particle()

@@ -13,3 +13,6 @@ function draw() {
 function mouseMoved() {
   mouseMovedInput();
 }
+
+function mousePressed() {
+}

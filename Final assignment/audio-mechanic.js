@@ -1,63 +1,63 @@
 let song;
-let img
+//let img
 let fft;
-let button
+//let button
 let particles = [];
 
-function preload() {
+function preloadAudio() {
   // Load the audio file
   song = loadSound("assets/music1.wav");
-  img = loadImage("assets/BGfinal.png")
+  //img = loadImage("assets/BGfinal.png")
 }
-
-function setup() {
-  createCanvas(900, 650);
+// cancel button setting
+function setupAudio() {
+  //createCanvas(900, 650);
   
   // Use degrees for drawing the circle
-  angleMode(DEGREES);
-  imageMode(CENTER)
-  rectMode(CENTER)
+  //angleMode(DEGREES);
+  //imageMode(CENTER)
+  //rectMode(CENTER)
 
   // Create the FFT analyser
   fft = new p5.FFT(0.3);
   fft.setInput(song);
 
-  img.filter(BLUR, 1)
+  //img.filter(BLUR, 1)
 
   // Create the play/pause button
-  button = createButton("Play/Pause");
-  button.position(380, 600);
-  button.size(140, 40);
-  button.style("font-size", "16px");
-  button.mousePressed(playPause);
+  //button = createButton("Play/Pause");
+  //button.position(380, 600);
+  //button.size(140, 40);
+  //button.style("font-size", "16px");
+  //button.mousePressed(playPause);
 }
 
-function draw() {
-  background(0);
-  
+function drawAudio() {
+  //background(0);
+  push();
   // Move the origin to the centre
   translate(width / 2, height / 2 - 20);
 
   fft.analyze()
   let amplitude = fft.getEnergy(20, 200);
 
-  push()
-  if (amplitude > 200){
-    rotate(random(-0.15,0.15))
-  }
+  //push()
+  //if (amplitude > 200){
+    //rotate(random(-0.15,0.15))
+  //}
   
-  image(img,0,0,width + 100,height + 100)
-  pop()
-
-  let alpha = map(amplitude, 0, 255, 150, 120)
+  //image(img,0,0,width + 100,height + 100)
+  //pop()
+rectMode(CENTER);
+  let alpha = map(amplitude, 0, 255, 100, 50)
   fill(0,0,0,alpha)
   rect(0,0,width + 100,height + 100)
 
 
   // Soft vignette
   push()
+  
   noFill()
-
   for(let i = 0; i < 140; i += 10){
     let vignetteAlpha = map(i,0,140,18,0)
     stroke(125,100,145,vignetteAlpha)
@@ -101,10 +101,12 @@ function draw() {
     for (let i = 0; i <= 180; i++) {
       let index = floor(map(i, 0, 180, 0, wave.length - 1));
 
-      let r = map(wave[index], -1, 1, 190, 250);
-
-      let x = r * sin(i) * t;
-      let y = r * cos(i);
+      let r = map(wave[index], -1, 1, 250, 310);
+      // Math.sin() and Math.cos() use radians, so convert i from degrees.
+      const angle = i * Math.PI / 180;
+      //r 是由波形设定的半径,t 取值为 -1 或 1
+      let x = r * Math.sin(angle) * t;
+      let y = r * Math.cos(angle);
 
       vertex(x, y);
     }
@@ -127,7 +129,7 @@ function draw() {
     }else{
       particles.splice(i, 1);
     }
-  }
+  }pop();
 }
 
 

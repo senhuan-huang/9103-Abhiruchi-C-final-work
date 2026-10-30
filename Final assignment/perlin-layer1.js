@@ -2,14 +2,15 @@ let leftBubble;
 let rightBubble;
 
 // Position is a fraction of the canvas width or height.
-let leftX = 0.25;
-let leftY = 0.5;
-let rightX = 0.75;
-let rightY = 0.5;
+//During size and position adjusting to suit the characters
+let leftX = 480 / 1220;
+let leftY = 0.33;
+let rightX = 725 / 1220;
+let rightY = 0.33;
 
 // Adjust each bubble separately.
-let leftSize = 0.33;
-let rightSize = 0.33;
+let leftSize = 0.2;
+let rightSize = 0.2;
 let leftShapeAmount = 0.8;
 let rightShapeAmount = 0.8;
 let leftSpeed = 0.38;
@@ -17,7 +18,7 @@ let rightSpeed = 0.34;
 
 function setupperlin() {
   //createCanvas(windowWidth, windowHeight);
-  pixelDensity(1);
+  //pixelDensity(1);
   frameRate(30);
   noiseSeed(41);
   noiseDetail(2, 0.5);

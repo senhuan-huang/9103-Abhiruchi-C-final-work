@@ -1,18 +1,23 @@
 function preload() {
   preloadInput();
   preloadtime();
+  preloadAudio();
 }
 
 function setup() {
   createCanvas(1220, 600);
   setuptime();
   setupperlin();
+  setupAudio();
 }
 
 function draw() {
   drawInput();
-  drawtime();
+  if (audioopen !== -1 && song.isPlaying()) drawAudio();
   drawperlin();
+  drawInput2();
+  drawtime();
+  
 }
 
 function mouseMoved() {
@@ -20,19 +25,14 @@ function mouseMoved() {
 }
 
 function mousePressed() {
+  mouseMovedInput();
+  //Ignore clicks outside both characters.
+  if (mousehover === -1) return;
+  //Remember which character was clicked: 0 = left, 1 = right.
+   audioopen = mousehover;
+   //browser audio after the click, then loop the song.
+  userStartAudio().then(() => {
+    if (!song.isPlaying()) song.loop();
+  });
 }
 
-function windowResized() {
-}
-
-function createBubble(seed, red, green, blue) {
-}
-
-function updateBubble(bubble, speed, amount) {
-}
-
-function drawOutline(bubble, radius, scale) {
-}
-
-function drawBubble(bubble, x, y, size) {
-}

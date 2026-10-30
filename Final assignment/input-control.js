@@ -37,8 +37,10 @@ function drawInput() {
   imageMode(CORNER);
   tint(255,255);
   image(backgroundImage, 0, 0, 1220, 600);
+}
 
-  //resetting characters positioning Method
+function drawInput2() {
+    //resetting characters positioning Method
   imageMode(CENTER);
   tint(255,255);
   image(C1, 480, 300, 255, 400);

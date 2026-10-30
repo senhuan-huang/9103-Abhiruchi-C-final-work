@@ -15,8 +15,8 @@ let rightShapeAmount = 0.8;
 let leftSpeed = 0.38;
 let rightSpeed = 0.34;
 
-function setup() {
-  createCanvas(windowWidth, windowHeight);
+function setupperlin() {
+  //createCanvas(windowWidth, windowHeight);
   pixelDensity(1);
   frameRate(30);
   noiseSeed(41);
@@ -27,7 +27,7 @@ function setup() {
   rightBubble = createBubble(97, 220, 234, 255);
 }
 
-function draw() {
+function drawperlin() {
   // Keep the background transparent.
   clear();
 

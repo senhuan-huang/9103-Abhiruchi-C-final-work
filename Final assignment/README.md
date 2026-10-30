@@ -68,7 +68,7 @@ The project does not directly reproduce Machado’s artworks. Instead, it adapts
 - **Audio control:** [TO BE COMPLETED BY AUDIO MECHANIC OWNER]
 - **Keyboard controls:** [WRITE “NONE” IF THERE ARE NO KEYBOARD CONTROLS]
 - **Reset control:** [ADD THE RESET KEY OR ACTION]
-- **Other interactions:** [TO BE COMPLETED BY USER INPUT MECHANIC OWNER]
+- **Other interactions:** [There is mouseMoved, the mouseMoved allows mouse hover on people. And it is trigger of color gradient changes. The people will continuously adjust the color gradient, each circuler is 4s,just like breath.]
 
 ## Techniques and Code Structure
 
@@ -133,7 +133,7 @@ The separation of the mechanics keeps the code modular while allowing the visual
 
 | Team Member | Mechanic | Script File | Responsibility |
 |---|---|---|---|
-| Senhuan Huang | User Input | `[ADD EXACT FILENAME]` | [TO BE COMPLETED BY SENHUAN] |
+| Senhuan Huang | User Input | `[Input-control,js]` | [Detects mouse hover over each character and controls the fade-in. Besides, the people will continuously adjust the color gradient, each circuler is 4s,just like breath. ] |
 | Xinya Huang | Audio | `[ADD EXACT FILENAME]` | [TO BE COMPLETED BY XINYA] |
 | Runqing Tian | Perlin Noise and Randomness | `[ADD EXACT FILENAME]` | [TO BE COMPLETED BY RUNQING] |
 | Leona Li | Time-based Interaction | `time-mechanic.js` or `[ADD FINAL FILENAME]` | Controls the independent thirteen-second life cycle of each character’s thought icons. |
@@ -144,25 +144,26 @@ The separation of the mechanics keeps the code modular while allowing the visual
 
 **Purpose**
 
-[EXPLAIN WHAT THE USER INPUT MECHANIC CONTRIBUTES TO THE CONCEPT]
+[The user input mechanic lets users reveal each character's colour by moving the mouse over it.]
 
 **Interaction**
 
-[EXPLAIN WHAT THE VIEWER DOES]
+[Move the cursor over either character. The characters respond independently. After a character has been hovered over once, its colour continues to change when the hover moves away.]
 
 **Visual Result**
 
-[EXPLAIN WHAT CHANGES ON SCREEN]
+[A colour image gradually appears over the white and grey character. When the mouse leaves, that colour layer gently "breath" between lower and higher opacity.]
 
 **Main Techniques**
 
-- [ADD MOUSE OR KEYBOARD FUNCTIONS]
-- [ADD HIT-DETECTION METHOD]
-- [ADD IMPORTANT VARIABLES OR CLASSES]
+- ["mouseMovedInput()" checks the mouse position and sets "mousehover" to "0" for the left character, "1" for the right character, or "-1" when neither is hovered over.]
+- [Separate hover areas identify the two characters.-- "leftHoverOnce" and "rightHoverOnce" remember whether each character has been hovered over.]
+- ["changeimagetransparency()"uses "sin()", "millis()", and "lerp()"to change the colour layer's opacity over time.]
+- ["drawInput()"and "drawInput2()" draw the background and character image layers on the canvas, independently. This approach is better suited for main sketches and also facilitates merging with sketches created by others.]
 
 **Main Script**
 
-`[ADD EXACT SCRIPT FILENAME]`
+`[input-control.js]`
 
 ---
 
@@ -264,10 +265,10 @@ Each team member must describe their own AI use below. AI-generated or AI-assist
 
 ### User Input – Senhuan Huang
 
-- **AI tool used:** [TO BE COMPLETED]
-- **What it was used for:** [TO BE COMPLETED]
-- **How the assisted code works:** [TO BE COMPLETED]
-- **How the code was reviewed or changed:** [TO BE COMPLETED]
+- **AI tool used:** [ChatGPT and Codex]
+- **What it was used for:** [Explaining p5.js functions, reviewing the transparency logic, and helping debug the integration with the main sketch.]
+- **How the assisted code works:** [changeimagetransparency() fades in that character's colour layer on first hover, then uses a sine wave and lerp() to vary its opacity after the cursor leaves.]
+- **How the code was reviewed or changed:** [ I adjusted the logic for determining a first time of mouse-entry(hover) event, then tested in the browser that each character responds when the cursor enters and leaves its area.]
 
 ### Audio – Xinya Huang
 

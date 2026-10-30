@@ -29,19 +29,20 @@ const STAGES = Object.freeze({
   DISSOLVE: "dissolve",
   COMPLETE: "complete",
 });
-
-let backgroundImage;
-let characterAImage;
-let characterBImage;
+//remove extra background imange
+//let backgroundImage;
+//let characterAImage;
+//let characterBImage;
 let iconImages = {};
 let characterA;
 let characterB;
 let cycleStartMillis = 0;
 
-function preload() {
-  backgroundImage = loadImage("assets/background.png");
-  characterAImage = loadImage("assets/people/character-a.png");
-  characterBImage = loadImage("assets/people/character-b.png");
+function preloadtime() {
+  //don't reuse backgrounds or characters
+  //backgroundImage = loadImage("assets/background.png");
+  //characterAImage = loadImage("assets/people/character-a.png");
+  //characterBImage = loadImage("assets/people/character-b.png");
 
   const iconFiles = [
     "A_calendar",
@@ -61,16 +62,16 @@ function preload() {
   }
 }
 
-function setup() {
-  const canvas = createCanvas(windowWidth, windowHeight);
-  canvas.parent("canvas-container");
-  imageMode(CENTER);
-  pixelDensity(1);
+function setuptime() {
+  //const canvas = createCanvas(windowWidth, windowHeight);
+  //canvas.parent("canvas-container");
+  //imageMode(CENTER);
+  //pixelDensity(1);
 
   characterA = new CharacterTimeline({
     id: "A",
     startAt: A_START_SECONDS,
-    personImage: characterAImage,
+    //personImage: characterAImage,
     personX: 430,
     personBottom: 760,
     personHeight: 650,
@@ -88,7 +89,7 @@ function setup() {
   characterB = new CharacterTimeline({
     id: "B",
     startAt: B_START_SECONDS,
-    personImage: characterBImage,
+    //personImage: characterBImage,
     personX: 1010,
     personBottom: 760,
     personHeight: 650,
@@ -106,32 +107,57 @@ function setup() {
   cycleStartMillis = millis();
 }
 
-function draw() {
-  const scene = getSceneTransform();
+//this part of drawtime is drawing for icons, and adjusting 
+//position of icon to suitable place
+function drawtime() {
   const seconds = (millis() - cycleStartMillis) / 1000;
-
-  drawBackgroundCover(backgroundImage);
-
-  push();
-  translate(scene.offsetX, scene.offsetY);
-  scale(scene.scale);
 
   characterA.update(seconds);
   characterB.update(seconds);
 
-  // Subtle connector lines and nodes stay behind the figures and icons.
-  characterA.displayAccents(seconds);
-  characterB.displayAccents(seconds);
-
-  characterA.displayPerson();
-  characterB.displayPerson();
-
-  // Icons are intentionally drawn after the figures, so they may overlap them.
+  push();
+  imageMode(CENTER);
+  translate(480, 300);
+  scale(400 / 650);
+  translate(-430, -435);
   characterA.displayIcons(seconds);
-  characterB.displayIcons(seconds);
+  pop();
 
+  push();
+  imageMode(CENTER);
+  translate(725, 300);
+  scale(400 / 650);
+  translate(-1010, -435);
+  characterB.displayIcons(seconds);
   pop();
 }
+
+//function drawtime() {
+  //const scene = getSceneTransform();
+  //const seconds = (millis() - cycleStartMillis) / 1000;
+
+  //drawBackgroundCover(backgroundImage);
+
+  //push();
+  //translate(scene.offsetX, scene.offsetY);
+  //scale(scene.scale);
+
+  //characterA.update(seconds);
+  //characterB.update(seconds);
+
+  // Subtle connector lines and nodes stay behind the figures and icons.
+  //characterA.displayAccents(seconds);
+  //characterB.displayAccents(seconds);
+
+  //characterA.displayPerson();
+  //characterB.displayPerson();
+
+  // Icons are intentionally drawn after the figures, so they may overlap them.
+  //characterA.displayIcons(seconds);
+  //characterB.displayIcons(seconds);
+
+  //pop();
+//}
 
 function keyPressed() {
   if (key === "r" || key === "R") {
@@ -139,9 +165,9 @@ function keyPressed() {
   }
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
+//function windowResized() {
+  //resizeCanvas(windowWidth, windowHeight);
+//}
 
 class CharacterTimeline {
   constructor(config) {

@@ -29,7 +29,7 @@ function setupperlin() {
 
 function drawperlin() {
   // Keep the background transparent.
-  clear();
+  //clear();
 
   let leftDiameter = min(width * leftSize, height * 0.62);
   let rightDiameter = min(width * rightSize, height * 0.62);

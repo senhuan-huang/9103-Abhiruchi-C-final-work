@@ -1,7 +1,3 @@
-# Independent Inner Worlds — Time-based Mechanic
-
-This p5.js prototype presents two characters whose inner worlds are revealed through independent, time-based icon sequences. The work runs automatically and does not require a mouse click.
-
 ## Inspiration
 
 The project is inspired by surreal, dreamlike representations of inner thoughts and by the idea that another person's inner world is only briefly visible. The illustrated twilight landscape, translucent figures and glowing organic icons shaped the visual direction. Instead of using clean interface-style symbols, the project uses irregular, luminous PNG icons so that thoughts feel alive, unstable and connected to the surrounding environment.
